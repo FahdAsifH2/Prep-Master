@@ -1,27 +1,36 @@
-const express = require('express')
-const app = express()
-const path = require("path")
-//middleware
-app.set("view engine","ejs")
-app.use(express.json())
-app.use(express.urlencoded({extended:true}))
-app.use(express.static(path.join(__dirname,"public")))
+const express = require('express');
+const path = require('path');
+const app = express();
+const authRoutes = require('./routes/auth'); // Import the routes
+
+// Set EJS as the view engine
+app.set('view engine', 'ejs');
+
+// Middleware for parsing JSON and URL-encoded data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Set views directory
+app.set('views', path.join(__dirname, 'views'));
+
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Define a route for the root path
+app.get('/', (req, res) => {
+    res.render('index'); // Ensure you have an index.ejs file
+});
+
+app.get('/index', (req, res) => {
+    res.render('index'); // Ensure you have an index.ejs file
+});
 
 
-app.get("/",(req,res)=>
-{
- console.log("home route")
- res.render("./index")
-})
+// Use the authRoutes router for all routes under the paths specified
+app.use('/', authRoutes); // Mount all routes under authRoutes at root level
 
-app.get("/index",(req,res)=>
-{
-    res.render("html")
-})
-app.listen(3000,(req,res)=>
-{
- console.log("app is listening on local host 3000")
-})
-
-
-
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`App is listening on http://localhost:${PORT}`);
+});
